@@ -1,0 +1,54 @@
+name: Check PBS Updates
+
+on:
+  schedule:
+    - cron: '15 8 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve latest PBS package version
+        id: latest
+        run: |
+          set -euo pipefail
+          latest_version="$(curl -fsSL http://download.proxmox.com/debian/pbs/dists/trixie/pbs-no-subscription/binary-amd64/Packages.gz | gzip -dc | awk '/^Package: proxmox-backup-server$/ {found=1} found && /^Version:/ {print $2; exit}')"
+          if [ -z "$latest_version" ]; then
+            echo "Failed to resolve latest proxmox-backup-server version" >&2
+            exit 1
+          fi
+          echo "latest=$latest_version" >> "$GITHUB_OUTPUT"
+
+      - name: Read tracked version
+        id: current
+        run: |
+          set -euo pipefail
+          current_version="$(tr -d '[:space:]' < VERSION)"
+          echo "current=$current_version" >> "$GITHUB_OUTPUT"
+
+      - name: Update VERSION
+        if: steps.latest.outputs.latest != steps.current.outputs.current
+        run: |
+          set -euo pipefail
+          printf '%s\n' '${{ steps.latest.outputs.latest }}' > VERSION
+
+      - name: Create pull request
+        if: steps.latest.outputs.latest != steps.current.outputs.current
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/pbs-${{ steps.latest.outputs.latest }}
+          commit-message: 'chore: bump PBS to ${{ steps.latest.outputs.latest }}'
+          title: 'chore: bump PBS to ${{ steps.latest.outputs.latest }}'
+          body: |
+            Automated PBS version bump.
+
+            - Previous: `${{ steps.current.outputs.current }}`
+            - Latest: `${{ steps.latest.outputs.latest }}`

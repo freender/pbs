@@ -1,0 +1,22 @@
+services:
+  pbs:
+    container_name: zavala
+    hostname: zavala
+    image: ghcr.io/freender/pbs:latest
+    pull_policy: always
+    restart: unless-stopped
+    mem_limit: 2g
+    ports:
+      - "8007:8007"
+    environment:
+      TZ: America/New_York
+    volumes:
+      - /mnt/cache/appdata/pbs/etc:/etc/proxmox-backup
+      - /mnt/cache/appdata/pbs/logs:/var/log/proxmox-backup
+      - /mnt/cache/appdata/pbs/lib:/var/lib/proxmox-backup
+      - /mnt/cache/pbs-datastore:/backups
+    tmpfs:
+      - /run:exec,mode=0755
+      - /tmp
+    cap_add:
+      - SYS_RAWIO
