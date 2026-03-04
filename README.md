@@ -2,6 +2,9 @@
 
 Docker-based PBS image + compose deployment for cinci.
 
+> [!WARNING]
+> Unsupported and unofficial. This is a personal homelab project and is not affiliated with or supported by Proxmox.
+
 ## Runtime Paths
 
 - `/mnt/cache/appdata/pbs/etc` -> `/etc/proxmox-backup`
