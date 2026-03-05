@@ -58,7 +58,21 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Detect workflow file changes
+        id: workflow_changes
+        run: |
+          set -euo pipefail
+          workflow_touched=false
+          while IFS= read -r path; do
+            if [[ "$path" == .github/workflows/* ]]; then
+              workflow_touched=true
+              break
+            fi
+          done < <(git show --name-only --pretty='' "$GITHUB_SHA")
+          echo "value=$workflow_touched" >> "$GITHUB_OUTPUT"
+
       - name: Create version tag
+        if: ${{ steps.workflow_changes.outputs.value != 'true' }}
         run: |
           set -euo pipefail
           version_tag="v${{ steps.version.outputs.value }}"
@@ -70,7 +84,14 @@ jobs:
           fi
 
       - name: Move latest tag
+        if: ${{ steps.workflow_changes.outputs.value != 'true' }}
         run: |
           set -euo pipefail
           git tag -fa latest -m "Latest PBS ${{ steps.version.outputs.value }}"
           git push origin latest --force
+
+      - name: Note skipped tag updates
+        if: ${{ steps.workflow_changes.outputs.value == 'true' }}
+        run: |
+          set -euo pipefail
+          echo "Skipping tag updates because this commit modifies workflow files and GITHUB_TOKEN cannot push refs to those commits without workflows permission."
