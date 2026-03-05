@@ -20,6 +20,13 @@ if [[ -d /etc/proxmox-backup/acme ]]; then
   chmod -R 0700 /etc/proxmox-backup/acme
 fi
 
+# Set root password for PAM auth (root@pam login in the web UI).
+# /etc/shadow is ephemeral — reset on every image pull — so we re-apply
+# the password from the env var on every startup.
+if [[ -n "${PBS_ROOT_PASSWORD:-}" ]]; then
+  printf 'root:%s\n' "${PBS_ROOT_PASSWORD}" | chpasswd
+fi
+
 # Remove stale lock files from unclean shutdown
 rm -f /etc/proxmox-backup/.*.lck /etc/proxmox-backup/*.lock
 

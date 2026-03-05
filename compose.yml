@@ -8,6 +8,9 @@ services:
     mem_limit: 2g
     ports:
       - "8007:8007"
+    env_file:
+      - path: /mnt/cache/appdata/pbs/.env
+        required: false
     environment:
       TZ: America/New_York
     volumes:
