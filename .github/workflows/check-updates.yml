@@ -20,7 +20,7 @@ jobs:
         run: |
           set -euo pipefail
           packages="$(curl -fsSL http://download.proxmox.com/debian/pbs/dists/trixie/pbs-no-subscription/binary-amd64/Packages.gz | gzip -dc)"
-          latest_version="$(printf '%s\n' "$packages" | awk '/^Package: proxmox-backup-server$/ {found=1} found && /^Version:/ {print $2; exit}')"
+          latest_version="$(awk '/^Package: proxmox-backup-server$/ {found=1} found && /^Version:/ {print $2; found=0}' <<< "$packages")"
           if [ -z "$latest_version" ]; then
             echo "Failed to resolve latest proxmox-backup-server version" >&2
             exit 1
