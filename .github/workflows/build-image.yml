@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
 
       - name: Read tracked version
         id: version
@@ -68,7 +70,7 @@ jobs:
               workflow_touched=true
               break
             fi
-          done < <(git show --name-only --pretty='' "$GITHUB_SHA")
+          done < <(git diff-tree --no-commit-id --name-only -r "$GITHUB_SHA")
           echo "value=$workflow_touched" >> "$GITHUB_OUTPUT"
 
       - name: Create version tag
