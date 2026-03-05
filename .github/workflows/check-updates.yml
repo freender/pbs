@@ -35,12 +35,14 @@ jobs:
           echo "current=$current_version" >> "$GITHUB_OUTPUT"
 
       - name: Commit version bump
-        if: steps.latest.outputs.latest != steps.current.outputs.current
+        if: ${{ steps.latest.outputs.latest != steps.current.outputs.current }}
+        env:
+          NEW_VERSION: ${{ steps.latest.outputs.latest }}
         run: |
           set -euo pipefail
-          printf '%s\n' '${{ steps.latest.outputs.latest }}' > VERSION
+          printf '%s\n' "$NEW_VERSION" > VERSION
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add VERSION
-          git commit -m "chore: bump PBS to ${{ steps.latest.outputs.latest }}"
+          git commit -m "chore: bump PBS to $NEW_VERSION"
           git push
