@@ -3,13 +3,22 @@ set -euo pipefail
 
 mkdir -p /run/proxmox-backup /etc/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup /backups
 
-# Fix top-level ownership (non-recursive). PBS hard-checks /etc/proxmox-backup
-# ownership at startup and refuses to run if it's not backup:backup (34:34).
-# After a backup restore, mounted volumes often come back as 1000:1000.
-chown backup:backup /etc/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup /backups
+# Fix permissions after backup restore (volumes come back as 1000:1000).
+# Recursive on small config/state/log dirs — safe, they're never large.
+# /backups is top-level only: datastore can be terabytes; PBS API (root) can
+# traverse it regardless, and the proxy only needs the mount point itself.
+chown -R backup:backup /etc/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup
 chmod 0700 /etc/proxmox-backup /var/lib/proxmox-backup /var/log/proxmox-backup
+chown backup:backup /backups
 chown backup:backup /run/proxmox-backup
 chmod 0755 /run/proxmox-backup
+
+# acme dir is managed by root (cert renewal runs as root); restore leaves it
+# as 1000:1000 with 0755. Fix ownership and mode back to root:root 0700.
+if [[ -d /etc/proxmox-backup/acme ]]; then
+  chown -R root:root /etc/proxmox-backup/acme
+  chmod -R 0700 /etc/proxmox-backup/acme
+fi
 
 # Remove stale lock files from unclean shutdown
 rm -f /etc/proxmox-backup/.*.lck /etc/proxmox-backup/*.lock
