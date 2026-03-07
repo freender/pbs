@@ -134,7 +134,7 @@ the push automatically when a new PBS version is detected.
 - Volumes mount to `/mnt/cache/appdata/pbs/*` (homelab convention).
 - Use `tmpfs` for `/run` and `/tmp`.
 - Memory limit: `2g`. Adjust only if PBS requires more.
-- `pull_policy: always` ensures fresh images on `docker compose up`.
+- Deploy script runs `docker compose pull` before `up -d` to ensure fresh images.
 
 ### GitHub Actions Workflows
 
