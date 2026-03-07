@@ -3,7 +3,6 @@ services:
     container_name: zavala
     hostname: zavala
     image: ghcr.io/freender/pbs:latest
-    pull_policy: always
     restart: unless-stopped
     mem_limit: 2g
     ports:
