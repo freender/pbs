@@ -28,7 +28,7 @@ Web UI: `https://<host>:8007` (default login: `root@pam`)
 Fully automated via two GitHub Actions workflows:
 
 1. **`check-updates.yml`** — runs daily, checks the Proxmox `pbs-no-subscription` apt repo for new `proxmox-backup-server` versions, commits the bump directly to `main`.
-2. **`build-image.yml`** — triggered on push to `main`, builds the image and pushes to `ghcr.io/freender/pbs` with both a pinned version tag and `latest`.
+2. **`build-image.yml`** — triggered on push to `main`, builds the image with the `proxmox-backup-server` package pinned to `VERSION`, lets apt resolve the client package, and pushes to `ghcr.io/freender/pbs` with both a pinned version tag and `latest`.
 
 ```
 detect new version -> commit to main -> build -> push image + git tags

@@ -36,7 +36,7 @@ EOF
 RUN printf '#!/bin/sh\nexit 0\n' > /usr/bin/systemctl \
   && chmod +x /usr/bin/systemctl \
   && apt-get update \
-  && if [ -n "$PBS_VERSION" ]; then DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confnew "proxmox-backup-server=${PBS_VERSION}" "proxmox-backup-client=${PBS_VERSION}"; else DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confnew proxmox-backup-server proxmox-backup-client; fi \
+  && if [ -n "$PBS_VERSION" ]; then DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confnew "proxmox-backup-server=${PBS_VERSION}" proxmox-backup-client; else DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends -o Dpkg::Options::=--force-confnew proxmox-backup-server proxmox-backup-client; fi \
   && rm -f /usr/bin/systemctl \
   && rm -rf /var/lib/apt/lists/* \
   && sed -i 's/^Enabled: yes$/Enabled: no/' /etc/apt/sources.list.d/proxmox.sources

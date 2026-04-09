@@ -112,7 +112,7 @@ the push automatically when a new PBS version is detected.
 - Use `set -euo pipefail` semantics (RUN commands fail on error by default).
 - Minimize layers: combine related `apt-get` commands with `&&` and clean
   up (`rm -rf /var/lib/apt/lists/*`) in the same layer.
-- Pin package versions via the `PBS_VERSION` build arg when available.
+- Pin the `proxmox-backup-server` package via the `PBS_VERSION` build arg when available.
 - Use heredocs (`<<'EOF'`) for multi-line file creation inside RUN.
 - Keep the subscription nag patch in place (the `no-nag-script` block).
 - Process supervisor: `runit` (`runsvdir`). Each service gets a
@@ -168,7 +168,7 @@ the push automatically when a new PBS version is detected.
 - **No package manager.** No npm, pip, cargo, etc. Just apt inside Docker.
 - **No linting in CI.** Run hadolint/shellcheck locally if modifying
   Dockerfile or shell scripts.
-- **VERSION is the source of truth** for the PBS version to build. CI reads
-  it; never hardcode versions elsewhere.
+- **VERSION is the source of truth** for the `proxmox-backup-server`
+  version to build. CI reads it; never hardcode versions elsewhere.
 - **Port 8007** is the only exposed port (Proxmox Backup Server web UI).
 - The Dockerfile build context is the repo root (`.`), not `docker/`.
